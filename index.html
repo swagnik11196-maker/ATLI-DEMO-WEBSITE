@@ -831,10 +831,13 @@ const DEP=[["all","All"],["lead","Leadership"],["fin","Finance"],["uw","Underwri
 const depOf=r=>/CEO|^Additional MD|SEVP|SVP|^VP &|HoD|Head of/.test(r)?"lead":/Finance/.test(r)?"fin":/Underwriting/.test(r)?"uw":/Claims/.test(r)?"clm":/Customer Service/.test(r)?"cs":/\bIT\b/.test(r)?"it":/Banca/.test(r)?"banca":/Group/.test(r)?"grp":"ops";
 const trRole=r=>{if(!r)return t("Team member");if(LNG!=="bn")return r;const f=lk(r);if(f!==r)return f;return r.split(", ").map(p=>ROLEW[p]||lk(p)).join(", ")};
 let SF="all";
+const nrm=s=>s.toLowerCase().replace(/\b(ms|mr|dr)\.?\s/g,"").replace(/[.,]/g,"").replace(/\s+/g," ").trim();
+const isMg=(nm,r)=>!!r&&MG.some(m=>nrm(m[0])===nrm(nm));
+const depFor=(nm,r)=>isMg(nm,r)?"lead":depOf(r||"");
 function staff(){const f=$("#sf-f");
 if(!f.children.length){DEP.forEach(([k,l])=>{const b=el("button",l);b.type="button";b.dataset.f=k;f.appendChild(b)});f.firstChild.classList.add("on");chipBind("#sf-f",b=>{SF=b.dataset.f;staff()})}else[...f.children].forEach((b,i)=>b.textContent=t(DEP[i][1]));
 const q=($("#sf-q").value||"").toLowerCase(),l=$("#sf-l");l.replaceChildren();let n=0;
-STAFF.forEach(([ph1,nm,r])=>{if(SF!=="all"&&depOf(r||"")!==SF)return;if(q&&!(nm+" "+(r||"")).toLowerCase().includes(q))return;n++;l.appendChild(card2(ph1,"corporate_management/",nm,r))});
+STAFF.forEach(([ph1,nm,r])=>{if(SF!=="all"&&depFor(nm,r)!==SF)return;if(q&&!(nm+" "+(r||"")).toLowerCase().includes(q))return;n++;l.appendChild(card2(ph1,"corporate_management/",nm,r))});
 $("#sf-c").textContent=bd(n)+" "+t("people");stagger()}
 $("#sf-q").oninput=staff;
 function card2(ph1,dir,nm,r,cls){const c=el("div","","pc2"+(cls?" "+cls:""));c.append(ph(ph1?(/^(data:|assets\/)/.test(ph1)?ph1:dir+ph1):"",nm));const b=document.createElement("b");b.textContent=nm;const s=document.createElement("span");s.textContent=trRole(r);c.append(b,s);return c}
